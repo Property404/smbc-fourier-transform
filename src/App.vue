@@ -1,11 +1,18 @@
 <template>
 <h1>Fouriest Transform</h1>
-<form>
-<input v-on:changeValue="updateValue" v-model="input_number" autofocus>
-<div v-if="!warning">{{output_number}}<sub>10</sub> ⇒ {{this.output_number_based}}<sub>{{this.output_base}}</sub></div>
-<div v-if="warning">{{warning}}</div>
-<button v-on:click.prevent="updateValue" type="submit">Calculate</button>
-</form>
+<div v-if="!help" class="main">
+  <input v-model="input_number" autofocus>
+  <div v-if="computedOutput.warning">{{computedOutput.warning}}</div>
+  <div v-if="!(computedOutput.warning)">
+    {{computedOutput.input}}<sub>10</sub> ⇒ {{computedOutput.value}}<sub>{{computedOutput.base}}</sub>
+  </div>
+  <button v-on:click="toggleHelp">Confused?</button>
+</div>
+<div v-if="help" class="main">
+  This app is a joke based off this SMBC comic
+  <img src="smbc-fourier.gif">
+  <button v-on:click="toggleHelp">Back</button>
+</div>
 </template>
 
 <script>
@@ -18,38 +25,44 @@ export default {
       output_number:null,
       output_number_based:null,
       output_base:null,
-      warning:null
+      warning:null,
+      help:false
     }
   },
   components: {
   },
-  beforeMount(){
-    this.updateValue();
-  },
-  methods:{
-    updateValue()
+  computed:{
+    computedOutput()
     {
-      this.output_number = parseInt(this.input_number,10);
-      this.warning = null;
-      if(this.output_number<1)
+      const output_number = parseInt(this.input_number,10);
+      if(output_number<1)
       {
-        this.warning = "Input must be greater than one";
+        return {warning:"Input must be greater than one"};
       }
-      else if(this.output_number != this.input_number)
+      else if(output_number != this.input_number)
       {
-        this.warning = "Input should be integer";
+        return {warning : "Input should be integer"};
       }
-      else if(this.output_number>800000)
+      else if(output_number>1000000)
       {
-        this.warning = "Number too large";
+        return {warning : "Number too large"};
       }
       else
       {
-        this.output_base = fouriest(this.input_number)
-        if(this.output_base === 0)
-          this.output_base = 10;
-        this.output_number_based = presentAsBase(this.output_number, this.output_base);
+        let output_base = fouriest(this.input_number)
+        if(output_base === 0)
+          output_base = 10;
+        return {
+          input: output_number,
+          value: presentAsBase(output_number, output_base),
+          base:output_base
+        };
       }
+    }
+  },
+  methods:{
+    toggleHelp(){
+      this.help=!this.help;
     }
   }
 }
@@ -63,6 +76,7 @@ html,body{
   background-color:#eee;
 }
 #app {
+  width:100%;
   display:flex;
   flex-direction:column;
   height:100%;
@@ -79,7 +93,7 @@ html,body{
     padding:.2rem;
     margin:0;
   }
-  form{
+  .main{
     height:100%;
     display:flex;
     flex-direction:column;
@@ -99,5 +113,24 @@ html,body{
       }
     }
   }
+
+  img{
+    mix-blend-mode: multiply;
+  }
+}
+@media(min-width:800px){
+  body{
+    display:flex;
+    justify-content:center;
+    #app{
+      max-width:800px;
+    }
+  }
+}
+@media(min-width:600px){
+      img{
+        max-width:75%;
+        align-self:center;
+      }
 }
 </style>

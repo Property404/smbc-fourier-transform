@@ -1,4 +1,6 @@
-# fouriest
+# SMBC Fourier Transform
+Joke app based off this SMBC comic  
+!["It's called a fourier transform when you take a number and convert it to the base system where it will have more fours, thus making it 'fourier.'"](public/smbc-fourier.gif)  
 
 ## Project setup
 ```
